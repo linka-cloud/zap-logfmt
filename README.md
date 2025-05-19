@@ -13,7 +13,7 @@ package main
 import (
 	"os"
 
-	"github.com/jsternberg/zap-logfmt"
+	"go.linka.cloud/zap-logfmt"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -38,7 +38,7 @@ package main
 import (
 	"os"
 
-	"github.com/jsternberg/zap-logfmt"
+	"go.linka.cloud/zap-logfmt"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )

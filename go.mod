@@ -1,4 +1,4 @@
-module github.com/jsternberg/zap-logfmt
+module go.linka.cloud/zap-logfmt
 
 go 1.17
 
