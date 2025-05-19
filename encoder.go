@@ -564,7 +564,17 @@ func (enc *literalEncoder) addSeparator() {
 }
 
 func needsQuotedValueRune(r rune) bool {
-	return r <= ' ' || r == '=' || r == '"' || r == utf8.RuneError
+	return !(
+		(r >= 'a' && r <= 'z') ||
+			(r >= 'A' && r <= 'Z') ||
+			(r >= '0' && r <= '9') ||
+			r == '-' ||
+			r == '.' ||
+			r == '_' ||
+			r == '/' ||
+			r == '@' ||
+			r == '^' ||
+			r == '+')
 }
 
 func addFields(enc zapcore.ObjectEncoder, fields []zapcore.Field) {

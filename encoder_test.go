@@ -21,7 +21,7 @@ func TestEncoderObjectFields(t *testing.T) {
 		{"bool", `k\\=true`, func(e zapcore.Encoder) { e.AddBool(`k\`, true) }}, // test key escaping once
 		{"bool", `k=true`, func(e zapcore.Encoder) { e.AddBool("k", true) }},
 		{"bool", `k=false`, func(e zapcore.Encoder) { e.AddBool("k", false) }},
-		{"byteString", `k=v\\`, func(e zapcore.Encoder) { e.AddByteString(`k`, []byte(`v\`)) }},
+		{"byteString", `k="v\\"`, func(e zapcore.Encoder) { e.AddByteString(`k`, []byte(`v\`)) }},
 		{"byteString", `k=v`, func(e zapcore.Encoder) { e.AddByteString("k", []byte("v")) }},
 		{"byteString", `k=`, func(e zapcore.Encoder) { e.AddByteString("k", []byte{}) }},
 		{"byteString", `k=`, func(e zapcore.Encoder) { e.AddByteString("k", nil) }},
@@ -44,7 +44,7 @@ func TestEncoderObjectFields(t *testing.T) {
 		{"int32", `k=42`, func(e zapcore.Encoder) { e.AddInt32("k", 42) }},
 		{"int16", `k=42`, func(e zapcore.Encoder) { e.AddInt16("k", 42) }},
 		{"int8", `k=42`, func(e zapcore.Encoder) { e.AddInt8("k", 42) }},
-		{"string", `k=v\\`, func(e zapcore.Encoder) { e.AddString(`k`, `v\`) }},
+		{"string", `k="v\\"`, func(e zapcore.Encoder) { e.AddString(`k`, `v\`) }},
 		{"string", `k=v`, func(e zapcore.Encoder) { e.AddString("k", "v") }},
 		{"string", `k=`, func(e zapcore.Encoder) { e.AddString("k", "") }},
 		{"string", `k="a b"`, func(e zapcore.Encoder) { e.AddString("k", "a b") }},
@@ -57,7 +57,7 @@ func TestEncoderObjectFields(t *testing.T) {
 		{"uintptr", `k=42`, func(e zapcore.Encoder) { e.AddUintptr("k", 42) }},
 		{
 			desc:     "array (success)",
-			expected: `k=a,b`,
+			expected: `k="a,b"`,
 			f: func(e zapcore.Encoder) {
 				assert.NoError(
 					t,
@@ -84,13 +84,15 @@ func TestEncoderObjectFields(t *testing.T) {
 				e.OpenNamespace("innermost")
 			},
 		},
-		{"reflected slice", "k=a,b", func(e zapcore.Encoder) { e.AddReflected("k", []string{"a", "b"}) }},
-		{"reflected slice of int", "k=1,2,3", func(e zapcore.Encoder) { e.AddReflected("k", []int16{1, 2, 3}) }},
-		{"reflected array", "k=a,b", func(e zapcore.Encoder) { e.AddReflected("k", [2]string{"a", "b"}) }},
+		{"reflected slice", `k="a,b"`, func(e zapcore.Encoder) { e.AddReflected("k", []string{"a", "b"}) }},
+		{"reflected slice of int", `k="1,2,3"`, func(e zapcore.Encoder) { e.AddReflected("k", []int16{1, 2, 3}) }},
+		{"reflected array", `k="a,b"`, func(e zapcore.Encoder) { e.AddReflected("k", [2]string{"a", "b"}) }},
 	}
 
 	for _, tt := range tests {
-		assertOutput(t, tt.desc, tt.expected, tt.f)
+		t.Run(tt.desc, func(t *testing.T) {
+			assertOutput(t, tt.desc, tt.expected, tt.f)
+		})
 	}
 }
 
@@ -150,7 +152,7 @@ func TestEncodeCaller(t *testing.T) {
 	enc.EncoderConfig.CallerKey = "caller"
 	encodeEntry()
 	assert.Nil(t, err)
-	assert.Equal(t, "caller=h2g2.go:42 k=v\n", buf.String())
+	assert.Equal(t, "caller=\"h2g2.go:42\" k=v\n", buf.String())
 }
 
 func TestEncodeStacktrace(t *testing.T) {
